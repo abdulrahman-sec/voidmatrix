@@ -6,4 +6,8 @@ voidmatrix.exe
 # Log files
 *.log
 rawkeys.log
+# Documentation
+DOCUMENTATION.md
+
+# Developer configs
 showcase.tape
