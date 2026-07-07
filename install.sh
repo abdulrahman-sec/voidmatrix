@@ -56,10 +56,12 @@ INSTALL_DIR="/usr/local/bin"
 echo "▶ Installing to $INSTALL_DIR..."
 
 if [ -w "$INSTALL_DIR" ]; then
+    rm -f "$INSTALL_DIR/voidmatrix"
     cp voidmatrix "$INSTALL_DIR/voidmatrix"
     chmod +x "$INSTALL_DIR/voidmatrix"
 else
     echo "Requesting sudo permissions to copy binary..."
+    sudo rm -f "$INSTALL_DIR/voidmatrix"
     sudo cp voidmatrix "$INSTALL_DIR/voidmatrix"
     sudo chmod +x "$INSTALL_DIR/voidmatrix"
 fi
