@@ -8,7 +8,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -17,6 +19,12 @@ import (
 )
 
 func main() {
+	// Check for subcommand update
+	if len(os.Args) > 1 && (os.Args[1] == "update" || os.Args[1] == "--update" || os.Args[1] == "-update") {
+		runSelfUpdate()
+		return
+	}
+
 	// ── Flags ──────────────────────────────────────────────────────────────
 	fSpeed   := flag.Float64("s", 0.45, "Speed multiplier (0.1–8.0)")
 	fDensity := flag.Float64("density", 0.72, "Streams per column (0.1–3.0; >1 = multiple per col)")
@@ -481,4 +489,23 @@ func isCLIExplicit(name string) bool {
 		}
 	}
 	return false
+}
+
+func runSelfUpdate() {
+	fmt.Println("⚡ Checking for voidmatrix updates from GitHub...")
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/c", "go install github.com/abdulrahman-sec/voidmatrix@latest")
+	} else {
+		cmd = exec.Command("sh", "-c", "curl -sSL https://raw.githubusercontent.com/abdulrahman-sec/voidmatrix/main/install.sh | sh")
+	}
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("\n❌ Update failed: %v\n", err)
+		fmt.Println("Please make sure you have Go/curl and internet connection, or install manually:")
+		fmt.Println("  go install github.com/abdulrahman-sec/voidmatrix@latest")
+		os.Exit(1)
+	}
+	fmt.Println("\n✅ voidmatrix updated successfully!")
 }
