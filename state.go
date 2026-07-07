@@ -288,10 +288,8 @@ func (s *State) initMessageGrid() {
 	}
 }
 
-// newStream allocates a stream for the given column.
-// If wave=true (single-wave mode) the stream starts just above row 0.
-func (s *State) newStream(col int, wave bool, init bool) *Stream {
-	// 3D parallax depth selection: 30% background (far), 50% midground, 20% foreground (near)
+// resetStream reinitialises an existing stream in-place to avoid heap allocations.
+func (s *State) resetStream(st *Stream, col int, wave bool, init bool) {
 	depthRoll := s.rng.float64()
 	var depth int
 	var tickPeriod int
@@ -341,29 +339,46 @@ func (s *State) newStream(col int, wave bool, init bool) *Stream {
 		startRow = -1 - s.rng.intn(3)
 	}
 
-	chars := make([]rune, length)
-	for i := range chars {
-		chars[i] = s.randRune()
+	// Reuse chars slice if capacity is large enough
+	if cap(st.chars) >= length {
+		st.chars = st.chars[:length]
+	} else {
+		st.chars = make([]rune, length)
+	}
+	for i := range st.chars {
+		st.chars[i] = s.randRune()
 	}
 
-	// Flashers: ~6% of cells glow and change every frame.
-	var flashers []bool
+	// Reuse flashers slice if capacity is large enough
 	if s.cfg.Flashers {
-		flashers = make([]bool, length)
-		for i := range flashers {
-			flashers[i] = s.rng.float64() < 0.06
+		if cap(st.flashers) >= length {
+			st.flashers = st.flashers[:length]
+		} else {
+			st.flashers = make([]bool, length)
 		}
+		for i := range st.flashers {
+			st.flashers[i] = s.rng.float64() < 0.06
+		}
+	} else {
+		st.flashers = nil
 	}
 
-	return &Stream{
-		col:        col,
-		head:       startRow,
-		length:     length,
-		chars:      chars,
-		flashers:   flashers,
-		tickPeriod: tickPeriod,
-		depth:      depth,
-	}
+	st.col = col
+	st.head = startRow
+	st.length = length
+	st.tickPeriod = tickPeriod
+	st.depth = depth
+	st.driftCounter = 0
+	st.localTick = 0
+	st.completed = false
+}
+
+// newStream allocates a stream for the given column.
+// If wave=true (single-wave mode) the stream starts just above row 0.
+func (s *State) newStream(col int, wave bool, init bool) *Stream {
+	st := &Stream{}
+	s.resetStream(st, col, wave, init)
+	return st
 }
 
 // Resize adapts to a new terminal size.
@@ -410,7 +425,7 @@ func (s *State) Tick() {
 
 	allDone := s.cfg.SingleWave // flipped to false below if any still running
 
-	for i, st := range s.streams {
+	for _, st := range s.streams {
 		// ── Flashers: mutate glowing cells every tick unconditionally ─────
 		if s.cfg.Flashers {
 			for j, flash := range st.flashers {
@@ -484,7 +499,7 @@ func (s *State) Tick() {
 				allDone = false
 			}
 		} else if dead {
-			s.streams[i] = s.newStream(s.rng.intn(s.width), false, false)
+			s.resetStream(st, s.rng.intn(s.width), false, false)
 		}
 	}
 
