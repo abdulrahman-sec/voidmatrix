@@ -86,11 +86,25 @@ go build -o voidmatrix .
 ./voidmatrix
 ```
 
-### Windows (PowerShell)
-```powershell
-go build -o voidmatrix.exe .
-.\voidmatrix.exe
-```
+### Windows Installation (CMD / PowerShell)
+
+#### Option 1: Direct Download (Easiest)
+1. Go to the [Releases](https://github.com/abdulrahman-sec/voidmatrix/releases) page.
+2. Download the pre-compiled `voidmatrix.exe` binary.
+3. Open CMD/PowerShell in your download folder and run it:
+   ```powershell
+   .\voidmatrix.exe
+   ```
+
+#### Option 2: Compile from Source (Requires Go)
+1. Download and install Go from [go.dev/dl](https://go.dev/dl/).
+2. Open PowerShell or Command Prompt, clone the repository, compile and run:
+   ```powershell
+   git clone https://github.com/abdulrahman-sec/voidmatrix.git
+   cd voidmatrix
+   go build -o voidmatrix.exe .
+   .\voidmatrix.exe
+   ```
 
 ### Makefile
 ```bash
@@ -227,13 +241,28 @@ This benchmark covers the simulation/snapshot path specifically. If you're exten
 
 ## 🏗️ Architecture
 
-```mermaid
-graph TD
-    Main[main.go — entry, CLI flags, dual-ticker clock] -->|ticks state| State[state.go — physics engine]
-    Main -->|polls input| Input[input.go — keyboard handling]
-    State -->|snapshot| Render[renderer.go — double-buffered diff rendering]
-    Input -->|mutates config| State
-    Render -->|draws| TCell[tcell/v2]
+```text
+   ┌───────────────────────────────────────────────┐
+   │ main.go (CLI flags, Config, Dual-Ticker loop) │
+   └───────────────────────┬───────────────────────┘
+                           │
+                 Ticks     │     Polls
+                 State     ▼     Input
+   ┌───────────────────────────────────────────────┐
+   │          state.go (Physics engine)            │◄───────┐
+   └───────────────────────┬───────────────────────┘        │
+                           │                                │
+                 Generates │                                │ Mutates
+                 Snapshot  ▼                                │ Config
+   ┌───────────────────────────────────────────────┐        │
+   │  renderer.go (Double-buffered cell matrices)  │        │
+   └───────────────────────┬───────────────────────┘        │
+                           │                                │
+                 Pushes    │                                │
+                 Diffs     ▼                                │
+   ┌───────────────────────────────────────────────┐        │
+   │               tcell/v2 Library                │────────┘
+   └───────────────────────────────────────────────┘
 ```
 
 | File | Responsibility |
