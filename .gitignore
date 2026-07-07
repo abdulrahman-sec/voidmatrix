@@ -1,0 +1,8 @@
+# Binaries
+voidmatrix
+voidmatrix.exe
+*.exe
+
+# Log files
+*.log
+rawkeys.log
