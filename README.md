@@ -274,13 +274,13 @@ This benchmark covers the simulation/snapshot path specifically. If you're exten
 | `charset.go` | Character sets (Hiragana, Katakana, Cyrillic, emoji, symbols) and aliases |
 | `input.go` | Non-blocking keyboard capture, triggers redraws |
 
-For a full technical breakdown of the rendering pipeline, PRNG, and zero-allocation snapshot pool, see [`DOCUMENTATION.md`](DOCUMENTATION.md).
+For a full technical breakdown of the rendering pipeline, PRNG, and zero-allocation snapshot pool, see the inline comments inside [main.go](main.go), [state.go](state.go), and [renderer.go](renderer.go).
 
 ---
 
 ## 🤝 Contributing
 
-Issues and PRs are welcome. If you're adding a feature, please check `DOCUMENTATION.md` first to keep the architecture consistent with the existing separation between state, rendering, and input.
+Issues and PRs are welcome. If you're adding a feature, please make sure your changes align with the modular separation between state (physics), rendering (tcell draw), and input handling.
 
 ---
 

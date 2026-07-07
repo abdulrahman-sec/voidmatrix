@@ -70,6 +70,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, `voidmatrix — Matrix-style digital rain, advanced edition
 
 Usage:  voidmatrix [flags]
+        voidmatrix update
 
   -s  SPEED     Speed multiplier 0.1–8.0 (default 0.45)
   -c  COLOR     Color: green red blue white cyan magenta purple rainbow
@@ -93,6 +94,7 @@ Usage:  voidmatrix [flags]
   --mode MODE   Preset visual mode: hacker, chill, chaos, cinematic
   --screensaver Screensaver mode: exit on any key, default 5 min auto-exit
   -d, --debug   Show performance profiling metrics HUD
+  update        Self-update the binary directly from GitHub
 
 Character set codes for -l:
   k  Half-width Katakana    K  Full-width Katakana
