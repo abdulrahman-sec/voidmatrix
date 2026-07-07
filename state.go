@@ -846,6 +846,18 @@ func (s *State) ToggleStatus() {
 	}
 }
 
+// ToggleDebug shows/hides the performance profiling metrics HUD.
+func (s *State) ToggleDebug() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cfg.Debug = !s.cfg.Debug
+	if s.cfg.Debug {
+		s.osd.set("  ✦ Perf HUD  ON  ")
+	} else {
+		s.osd.set("  ✦ Perf HUD  OFF  ")
+	}
+}
+
 func (s *State) GetSpeed() float64 {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

@@ -139,7 +139,8 @@ All controls apply live, no restart needed.
 | `B` | Cycle bold mode (Mixed / All / None) |
 | `C` | Cycle character sets |
 | `1`–`9` | Color theme: Green, Red, Blue, White, Rainbow, Purple, Cyan, Amber, Gold |
-| `O` | Toggle metrics HUD overlay |
+| `O` | Toggle OSD notifications overlay |
+| `P` | Toggle performance metrics HUD overlay |
 | `Space` / `Q` | Quit safely |
 
 ---

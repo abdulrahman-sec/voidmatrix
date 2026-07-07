@@ -120,6 +120,10 @@ func (h *InputHandler) handleKey(e *tcell.EventKey) bool {
 	case e.Rune() == 'o', e.Rune() == 'O':
 		h.state.ToggleStatus()
 
+	// p = performance HUD toggle
+	case e.Rune() == 'p', e.Rune() == 'P':
+		h.state.ToggleDebug()
+
 	// c = cycle charset
 	case e.Rune() == 'c', e.Rune() == 'C':
 		h.state.CycleCharSet()
