@@ -13,7 +13,7 @@ __  __(_) __| |_ __  __ _ _  _| |_| |_ __ __ __
 
 ## 🎬 Showcase
 
-![Showcase](showcase.gif)
+![Showcase](showcase.png)
 
 ---
 
