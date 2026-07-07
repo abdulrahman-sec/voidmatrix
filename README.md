@@ -223,15 +223,23 @@ The core simulation loop (stream ticking + snapshotting) is benchmarked directly
 go test -bench=BenchmarkSnapshot -benchmem -race .
 ```
 
-Measured result on the reference machine:
+Measured results on the reference machine:
 
-```
+| OS / CPU | Benchmark Target | Runs | Latency | Memory / Op | Allocations | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `linux / amd64` | `BenchmarkSnapshot-4` | `415,460` | `3,002 ns/op` | **`0 B/op`** | **`0 allocs/op`** | `PASS` ✅ |
+
+<details>
+<summary>View raw terminal output</summary>
+
+```text
 goos: linux
 goarch: amd64
 BenchmarkSnapshot-4       415460              3002 ns/op               0 B/op           0 allocs/op
 PASS
 ok      github.com/austin/voidmatrix    1.310s
 ```
+</details>
 
 `0 B/op` / `0 allocs/op` confirms steady-state stream ticking and snapshotting do not touch the heap — including on stream respawn, where an earlier version of `newStream` was reallocating a struct and two slices every time a column died. That path was refactored into an in-place `resetStream` that reslices existing backing arrays instead.
 
