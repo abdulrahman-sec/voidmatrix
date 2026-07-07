@@ -97,6 +97,12 @@ On Windows, `voidmatrix` runs natively inside Windows Terminal, PowerShell, or C
     go install github.com/yourusername/voidmatrix@latest
     ```
 
+### 6. Self-Updating (macOS / Linux / Windows)
+You can update `voidmatrix` to the latest version directly from GitHub at any time by running:
+```bash
+voidmatrix update
+```
+
 ---
 
 ## 🎮 Real-time Controls

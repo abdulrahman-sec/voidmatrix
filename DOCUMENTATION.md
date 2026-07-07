@@ -214,3 +214,10 @@ go build -o voidmatrix.exe .
 # 4. Overriding a preset mode option:
 .\voidmatrix.exe --mode chill -c purple
 ```
+
+### ⚙️ Self-Updating
+You can trigger a self-update of the binary at any time by running:
+```bash
+voidmatrix update
+```
+This will automatically pull the latest codebase from GitHub and install it into your path (using `install.sh` on macOS/Linux and `go install` on Windows).
