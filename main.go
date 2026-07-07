@@ -516,7 +516,7 @@ func runSelfUpdate() {
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("cmd", "/c", "go install github.com/abdulrahman-sec/voidmatrix@latest")
 	} else {
-		cmd = exec.Command("sh", "-c", "curl -sSL https://raw.githubusercontent.com/abdulrahman-sec/voidmatrix/main/install.sh | sh")
+		cmd = exec.Command("sh", "-c", "curl -sSL \"https://raw.githubusercontent.com/abdulrahman-sec/voidmatrix/main/install.sh?t=$(date +%s)\" | sh")
 	}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
