@@ -34,6 +34,7 @@
 |---|:---:|:---:|:---:|
 | 3D parallax depth layers | ❌ | ❌ | ✅ |
 | Zero heap allocations at steady-state | ❌ | ❌ | ✅ |
+| Native Windows build (no ncurses/MinGW) | ❌ | ❌ | ✅ |
 | Live text decoder reveal | ❌ | ✅ (partial) | ✅ |
 | Wind skew / ground splash physics | ❌ | ❌ | ✅ |
 | Config file + preset modes | ❌ | ❌ | ✅ |
