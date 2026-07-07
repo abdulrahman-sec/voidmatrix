@@ -6,13 +6,15 @@
 
 set -e
 
-# ANSI escape codes for styling
+# Evaluate ANSI escape codes portably using printf
 BOLD=$(printf '\033[1m')
 GREEN=$(printf '\033[32m')
 RED=$(printf '\033[31m')
+CYAN=$(printf '\033[36m')
 RESET=$(printf '\033[0m')
 
-echo "${BOLD}=== voidmatrix Installer ===${RESET}"
+echo "${BOLD}=== VoidMatrix Installer ===${RESET}"
+echo ""
 
 # 1. Check if Go is installed
 if ! command -v go >/dev/null 2>&1; then
@@ -22,20 +24,40 @@ if ! command -v go >/dev/null 2>&1; then
 fi
 
 # 2. Build the binary from source
-echo "Compiling voidmatrix from source..."
-go build -o voidmatrix .
+echo "▶ Compiling from source..."
+if ! go build -o voidmatrix .; then
+    echo ""
+    echo "${RED}❌ Build failed!${RESET}"
+    exit 1
+fi
+echo "${GREEN}✔ Build complete${RESET}"
+echo ""
 
 # 3. Resolve installation directory
 INSTALL_DIR="/usr/local/bin"
+echo "▶ Installing to $INSTALL_DIR..."
+
 if [ -w "$INSTALL_DIR" ]; then
-    echo "Installing binary to $INSTALL_DIR..."
     cp voidmatrix "$INSTALL_DIR/voidmatrix"
     chmod +x "$INSTALL_DIR/voidmatrix"
 else
-    echo "Sudo permissions required to write to $INSTALL_DIR."
+    echo "Requesting sudo permissions to copy binary..."
     sudo cp voidmatrix "$INSTALL_DIR/voidmatrix"
     sudo chmod +x "$INSTALL_DIR/voidmatrix"
 fi
+echo "${GREEN}✔ Installed successfully${RESET}"
+echo ""
 
-echo "${GREEN}${BOLD}=== Installation Successful! ===${RESET}"
-echo "Type ${BOLD}voidmatrix${RESET} in your terminal to enter the matrix."
+# 4. Display confirmation card
+echo "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+echo "${BOLD}🚀 VoidMatrix is ready!${RESET}"
+echo ""
+echo "Run:"
+echo "  ${BOLD}voidmatrix${RESET}"
+echo ""
+echo "Optional:"
+echo "  voidmatrix --help"
+echo ""
+echo "Uninstall:"
+echo "  sudo rm $INSTALL_DIR/voidmatrix"
+echo "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
