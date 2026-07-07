@@ -23,17 +23,35 @@ if ! command -v go >/dev/null 2>&1; then
     exit 1
 fi
 
-# 2. Build the binary from source
+# 2. Check if git is installed
+if ! command -v git >/dev/null 2>&1; then
+    echo "${RED}Error: Git is not installed on this system.${RESET}"
+    echo "Please install Git and rerun this script."
+    exit 1
+fi
+
+# 3. Clone the source code into a temporary directory
+echo "▶ Fetching source code from GitHub..."
+TEMP_DIR=$(mktemp -d /tmp/voidmatrix-XXXXXX)
+git clone --depth 1 https://github.com/abdulrahman-sec/voidmatrix.git "$TEMP_DIR" >/dev/null 2>&1
+
+# 4. Build the binary from source
 echo "▶ Compiling from source..."
+# Save current directory to return back to it
+ORIG_DIR=$(pwd)
+cd "$TEMP_DIR"
+
 if ! go build -o voidmatrix .; then
     echo ""
     echo "${RED}❌ Build failed!${RESET}"
+    cd "$ORIG_DIR"
+    rm -rf "$TEMP_DIR"
     exit 1
 fi
 echo "${GREEN}✔ Build complete${RESET}"
 echo ""
 
-# 3. Resolve installation directory
+# 5. Resolve installation directory
 INSTALL_DIR="/usr/local/bin"
 echo "▶ Installing to $INSTALL_DIR..."
 
@@ -48,7 +66,11 @@ fi
 echo "${GREEN}✔ Installed successfully${RESET}"
 echo ""
 
-# 4. Display confirmation card
+# Clean up
+cd "$ORIG_DIR"
+rm -rf "$TEMP_DIR"
+
+# 6. Display confirmation card
 echo "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
 echo "${BOLD}🚀 VoidMatrix is ready!${RESET}"
 echo ""
