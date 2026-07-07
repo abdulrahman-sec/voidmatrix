@@ -402,11 +402,30 @@ func clampFloat(v, min, max float64) float64 {
 }
 
 func loadConfigFile() {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return
+	var configPath string
+
+	// 1. Try standard user config directory: ~/.config/voidmatrix/config.yaml
+	if configDir, err := os.UserConfigDir(); err == nil {
+		configPath = filepath.Join(configDir, "voidmatrix", "config.yaml")
 	}
-	configPath := filepath.Join(home, ".voidmatrix", "config.yaml")
+
+	// 2. Fallback check: if standard doesn't exist, check legacy ~/.voidmatrix/config.yaml
+	if configPath != "" {
+		if _, err := os.Stat(configPath); os.IsNotExist(err) {
+			if home, err := os.UserHomeDir(); err == nil {
+				legacyPath := filepath.Join(home, ".voidmatrix", "config.yaml")
+				if _, err := os.Stat(legacyPath); err == nil {
+					configPath = legacyPath
+				}
+			}
+		}
+	} else {
+		// Fallback if os.UserConfigDir() failed
+		if home, err := os.UserHomeDir(); err == nil {
+			configPath = filepath.Join(home, ".voidmatrix", "config.yaml")
+		}
+	}
+
 	content, err := os.ReadFile(configPath)
 	if err != nil {
 		if os.IsNotExist(err) {

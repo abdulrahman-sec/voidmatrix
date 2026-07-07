@@ -182,7 +182,7 @@ Ensure you have Go installed on your system.
 
 ### One-Line Installer (macOS / Linux)
 ```bash
-curl -sSL https://raw.githubusercontent.com/yourusername/voidmatrix/main/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/abdulrahman-sec/voidmatrix/main/install.sh | sh
 ```
 
 ### Manual Build (macOS / Linux)

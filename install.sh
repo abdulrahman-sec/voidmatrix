@@ -2,15 +2,15 @@
 # voidmatrix installer script
 #
 # Usage:
-#   curl -sSL https://raw.githubusercontent.com/yourusername/voidmatrix/main/install.sh | sh
+#   curl -sSL https://raw.githubusercontent.com/abdulrahman-sec/voidmatrix/main/install.sh | sh
 
 set -e
 
 # ANSI escape codes for styling
-BOLD="\033[1m"
-GREEN="\033[32m"
-RED="\033[31m"
-RESET="\033[0m"
+BOLD=$(printf '\033[1m')
+GREEN=$(printf '\033[32m')
+RED=$(printf '\033[31m')
+RESET=$(printf '\033[0m')
 
 echo "${BOLD}=== voidmatrix Installer ===${RESET}"
 
