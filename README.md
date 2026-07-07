@@ -241,29 +241,7 @@ This benchmark covers the simulation/snapshot path specifically. If you're exten
 
 ## 🏗️ Architecture
 
-```text
-   ┌───────────────────────────────────────────────┐
-   │ main.go (CLI flags, Config, Dual-Ticker loop) │
-   └───────────────────────┬───────────────────────┘
-                           │
-                 Ticks     │     Polls
-                 State     ▼     Input
-   ┌───────────────────────────────────────────────┐
-   │          state.go (Physics engine)            │◄───────┐
-   └───────────────────────┬───────────────────────┘        │
-                           │                                │
-                 Generates │                                │ Mutates
-                 Snapshot  ▼                                │ Config
-   ┌───────────────────────────────────────────────┐        │
-   │  renderer.go (Double-buffered cell matrices)  │        │
-   └───────────────────────┬───────────────────────┘        │
-                           │                                │
-                 Pushes    │                                │
-                 Diffs     ▼                                │
-   ┌───────────────────────────────────────────────┐        │
-   │               tcell/v2 Library                │────────┘
-   └───────────────────────────────────────────────┘
-```
+![voidmatrix Architecture](architecture.png)
 
 | File | Responsibility |
 |---|---|
