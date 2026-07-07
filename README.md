@@ -82,7 +82,14 @@ make install PREFIX=$HOME/.local
 go install github.com/yourusername/voidmatrix@latest
 ```
 
-### 5. Windows Installation (PowerShell / CMD)
+### 5. Arch Linux (AUR)
+If you are running Arch Linux (or an Arch-based distro), you can build and install natively using the included `PKGBUILD`:
+```bash
+makepkg -si
+```
+*(Once you submit it to the Arch User Repository, it will be installable via AUR helpers like `yay -S voidmatrix-git`).*
+
+### 6. Windows Installation (PowerShell / CMD)
 On Windows, `voidmatrix` runs natively inside Windows Terminal, PowerShell, or Command Prompt (CMD).
 *   **Compile Executable**:
     ```powershell
@@ -97,7 +104,7 @@ On Windows, `voidmatrix` runs natively inside Windows Terminal, PowerShell, or C
     go install github.com/yourusername/voidmatrix@latest
     ```
 
-### 6. Self-Updating (macOS / Linux / Windows)
+### 7. Self-Updating (macOS / Linux / Windows)
 You can update `voidmatrix` to the latest version directly from GitHub at any time by running:
 ```bash
 voidmatrix update

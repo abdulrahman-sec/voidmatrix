@@ -200,6 +200,12 @@ go build -o voidmatrix .
 ./voidmatrix --mode chill -c purple
 ```
 
+### Arch Linux (AUR)
+```bash
+# Build and install natively using the PKGBUILD:
+makepkg -si
+```
+
 ### On Windows (CMD / PowerShell)
 ```powershell
 # 1. Compile the program
