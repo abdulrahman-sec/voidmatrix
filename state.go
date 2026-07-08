@@ -104,6 +104,7 @@ type Config struct {
 	Message     string        // custom message to decode on screen
 	Screensaver bool          // true to enable screensaver mode (exit on any key)
 	Debug       bool          // show performance metrics HUD
+	NoCheckUpdate bool        // disable startup update checker
 }
 
 // ---------------------------------------------------------------------------
@@ -905,4 +906,11 @@ func renderBar(fraction float64, width int) string {
 		}
 	}
 	return string(b)
+}
+
+// NotifyUpdate safely sets the OSD message to notify of an available update.
+func (s *State) NotifyUpdate(version string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.osd.set(fmt.Sprintf("  ⚡ Update available: %s! Run 'voidmatrix update'  ", version))
 }

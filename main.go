@@ -5,19 +5,24 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
 	_ "github.com/gdamore/tcell/v2/terminfo/extended"
 )
+
+const Version = "v1.0.2"
 
 func main() {
 	// Check for subcommand update
@@ -49,6 +54,7 @@ func main() {
 	fMode    := flag.String("mode", "", "Preset visual mode: hacker chill chaos cinematic")
 	fScreensaver := flag.Bool("screensaver", false, "Screensaver mode: exit on any key, auto-exit timer")
 	fDebug       := flag.Bool("d", false, "Show performance profiling metrics HUD")
+	fNoCheckUpdate := flag.Bool("no-check-update", false, "Disable startup update check")
 
 	// Long-form aliases
 	flag.Float64Var(fSpeed,    "speed",    0.45,  "")
@@ -295,6 +301,7 @@ Examples:
 		Message:     *fMsg,
 		Screensaver: *fScreensaver,
 		Debug:       *fDebug,
+		NoCheckUpdate: *fNoCheckUpdate,
 	}
 
 	// ── Renderer ────────────────────────────────────────────────────────────
@@ -313,6 +320,10 @@ Examples:
 	quit := make(chan struct{}, 1)
 	redrawChan := make(chan struct{}, 1)
 	go NewInputHandler(renderer.Screen(), state, quit, redrawChan).Run()
+
+	if !cfg.NoCheckUpdate {
+		go checkForUpdates(state)
+	}
 
 	// Optional exit timer.
 	var exitTimer <-chan time.Time
@@ -462,6 +473,8 @@ func loadConfigFile() {
 		"splash":       "splash",
 		"glitch":       "glitch",
 		"message":      "message",
+		"check-update": "no-check-update",
+		"check_update": "no-check-update",
 	}
 
 	lines := strings.Split(string(content), "\n")
@@ -496,6 +509,13 @@ func loadConfigFile() {
 
 		f := flag.Lookup(flagName)
 		if f != nil {
+			if flagName == "no-check-update" {
+				if key == "check-update" || key == "check_update" {
+					if pb, err := strconv.ParseBool(val); err == nil {
+						val = strconv.FormatBool(!pb)
+					}
+				}
+			}
 			if err := flag.Set(flagName, val); err != nil {
 				fmt.Fprintf(os.Stderr, "Warning: config.yaml line %d: failed to set option '%s' to '%s': %v\n", lineNum+1, key, val, err)
 			}
@@ -534,4 +554,110 @@ func runSelfUpdate() {
 		os.Exit(1)
 	}
 	fmt.Println("\n✅ voidmatrix updated successfully!")
+}
+
+func getUpdateCheckFilePath() string {
+	if configDir, err := os.UserConfigDir(); err == nil {
+		return filepath.Join(configDir, "voidmatrix", ".last_update_check")
+	}
+	if home, err := os.UserHomeDir(); err == nil {
+		return filepath.Join(home, ".voidmatrix", ".last_update_check")
+	}
+	return ""
+}
+
+func parseStrInt(s string) int {
+	if v, err := strconv.Atoi(s); err == nil {
+		return v
+	}
+	return 0
+}
+
+func parseSemVer(v string) (major, minor, patch int, isPre bool) {
+	v = strings.TrimPrefix(v, "v")
+	if idx := strings.Index(v, "-"); idx != -1 {
+		isPre = true
+		v = v[:idx]
+	}
+	parts := strings.Split(v, ".")
+	if len(parts) > 0 {
+		major = parseStrInt(parts[0])
+	}
+	if len(parts) > 1 {
+		minor = parseStrInt(parts[1])
+	}
+	if len(parts) > 2 {
+		patch = parseStrInt(parts[2])
+	}
+	return
+}
+
+func isNewerVersion(current, latest string) bool {
+	curMajor, curMinor, curPatch, curPre := parseSemVer(current)
+	latMajor, latMinor, latPatch, latPre := parseSemVer(latest)
+
+	if latPre && !curPre {
+		return false
+	}
+	if latMajor != curMajor {
+		return latMajor > curMajor
+	}
+	if latMinor != curMinor {
+		return latMinor > curMinor
+	}
+	if latPatch != curPatch {
+		return latPatch > curPatch
+	}
+	if curPre && !latPre {
+		return true
+	}
+	return false
+}
+
+type githubRelease struct {
+	TagName string `json:"tag_name"`
+}
+
+func checkForUpdates(state *State) {
+	path := getUpdateCheckFilePath()
+	if path == "" {
+		return
+	}
+
+	if info, err := os.Stat(path); err == nil {
+		if time.Since(info.ModTime()) < 24*time.Hour {
+			return
+		}
+	}
+
+	req, err := http.NewRequest("GET", "https://api.github.com/repos/abdulrahman-sec/voidmatrix/releases/latest", nil)
+	if err != nil {
+		return
+	}
+	req.Header.Set("User-Agent", "voidmatrix/"+Version)
+
+	client := &http.Client{Timeout: 3 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return
+	}
+
+	var rel githubRelease
+	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
+		return
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err == nil {
+		_ = os.WriteFile(path, []byte(strconv.FormatInt(time.Now().Unix(), 10)), 0644)
+	}
+
+	if isNewerVersion(Version, rel.TagName) {
+		time.Sleep(1 * time.Second)
+		state.NotifyUpdate(rel.TagName)
+	}
 }

@@ -204,7 +204,19 @@ theme: green
 glitch: false
 wind: none
 splash: false
+check-update: true # set to false to fully disable network check
 ```
+
+### 🛡️ Privacy & Update Checking
+
+By default, `voidmatrix` runs a quick, non-blocking background check on startup to query the latest stable release tag from the GitHub API:
+- Query is run asynchronously in a background goroutine (max once per 24 hours).
+- Has a strict 3-second timeout and fails completely silently with zero side effects on offline, air-gapped, or DNS-blocked networks.
+- **Opt-Out**: You can fully guarantee zero outbound network calls by passing the `--no-check-update` CLI flag, or setting `check-update: false` in your `config.yaml` file.
+
+### ⚡ Memory Tuning
+
+The core animation state machine and snapshot generation are verified zero-allocation (0 B/op, 0 allocs/op). Rendering to a real terminal generates approximately 2,015 heap allocations per frame, entirely from `tcell`'s internal terminfo escape-sequence formatting (`TParm`) — not from `voidmatrix`'s own code. `GOGC=500` tuning reduces how often these are collected, not how many occur.
 
 ---
 
