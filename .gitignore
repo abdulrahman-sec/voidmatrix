@@ -11,3 +11,9 @@ DOCUMENTATION.md
 
 # Developer configs
 showcase.tape
+
+# Video recordings
+*.mp4
+*.webm
+showcase.mp4
+showcase.webm
