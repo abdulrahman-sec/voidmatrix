@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -123,6 +124,10 @@ Examples:
 	}
 	loadConfigFile()
 	flag.Parse()
+
+	if os.Getenv("GOGC") == "" {
+		debug.SetGCPercent(500)
+	}
 
 	// ── Apply Preset Modes ──────────────────────────────────────────────────
 	if *fMode != "" {
